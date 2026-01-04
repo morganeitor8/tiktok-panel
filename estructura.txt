@@ -1,0 +1,28 @@
+TikTok
+├── venv/                   # entorno virtual
+├── cache                   # cache para carga rapida
+│   └── .
+├── core/
+│   ├── profile/
+│   │   └── config.json     # configuracion de perfil
+│   ├── content_tiktok.py   # tunel con TikTok
+│   ├── effects.py          # probar efectos
+│   ├── gift_anim.py        # central de efectos
+│   └── main.py             # inicio de todo
+├── effect/
+│   ├── __init__.py
+│   ├── effect_boom.py
+│   ├── effect_rebote.py
+│   ├── effect_sonidoR.py
+│   └── effect_videoR.py
+├── icon/                   # imagenes e iconos
+│   └── .
+├── song/                   # sonidos y canciones
+│   └── .
+├── video/                  # videos
+│   └── .
+├── requirements.txt        # dependencias
+├── loading.png             # logo de carga
+├── install.bat             # instala las dependencias en un entorno virtual
+├── efectos.bat             # ejecutar test de efectos
+└── start.bat               # ejecutar main

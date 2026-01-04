@@ -1,0 +1,71 @@
+{
+    "usuario_tiktok": "gaby_y.r",
+    "delay": 1.0,
+    "skip_delay_priority": true,
+    "msg_follow": "{user} empezo a seguirte",
+    "msg_gift": "{user} envió {cant} {gift}",
+    "voice_chat": false,
+    "voice_follow": false,
+    "voice_gift": false,
+    "filters_enabled": true,
+    "filtros": [
+        {
+            "evento": "follow",
+            "filtro": "19_tuturu_1",
+            "duracion": "0"
+        },
+        {
+            "evento": "White Rose",
+            "filtro": "17_tmpdbnm_5a3",
+            "duracion": "5"
+        },
+        {
+            "evento": "Rosa",
+            "filtro": "3_fahhhhhhhhhhhhhh",
+            "duracion": "5"
+        },
+        {
+            "evento": "Heart Me",
+            "filtro": "0_anime-wow-sound-effect",
+            "duracion": "5"
+        }
+    ],
+    "eventos": [
+        "2026",
+        "Blue Heart",
+        "Cake Slice",
+        "Cap",
+        "Capybara",
+        "Doughnut",
+        "Elephant trunk",
+        "Finger Heart",
+        "Flame Heart GDM",
+        "GG",
+        "Glow Stick",
+        "Graduation Bouquet",
+        "Hat and Mustache",
+        "Heart",
+        "Heart Me",
+        "Heart Puff",
+        "Hearts",
+        "I'm Ready",
+        "Ice Cream Cone",
+        "Love you so much",
+        "Maracas",
+        "Popular Vote",
+        "Rosa",
+        "Rose",
+        "Squirrel",
+        "TGIF",
+        "Team Cheers",
+        "TikTok",
+        "Wave Firework",
+        "White Rose",
+        "Woodland Wonder",
+        "You're awesome"
+    ],
+    "reconnect_interval": 5,
+    "reconnect_attempts": 5,
+    "volume_tts": 100,
+    "volume_effects": 20
+}

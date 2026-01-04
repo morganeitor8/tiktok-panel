@@ -1,0 +1,18 @@
+# === CORE TKINTER (viene con Python, no necesita instalación) ===
+
+# === AUDIO Y SONIDOS ===
+pygame>=2.5.0
+gTTS>=2.5.0
+
+# === TIKTOK LIVE SCRAPER ===
+TikTokLive>=6.6.5
+
+# === EFECTOS VISUALES ===
+Pillow>=10.0.0
+opencv-python>=4.8.0  # Solo si usas videoR sin VLC (opcional)
+
+# === VIDEO CON AUDIO (RECOMENDADO) ===
+python-vlc>=3.0.20
+
+# === UTILIDADES ===
+requests>=2.31.0  # Para validación de usuario (opcional)
