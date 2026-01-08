@@ -1,10 +1,10 @@
 {
-    "usuario_tiktok": "gaby_y.r",
+    "usuario_tiktok": "sportivotessa_oficial",
     "delay": 1.0,
     "skip_delay_priority": true,
     "msg_follow": "{user} empezo a seguirte",
     "msg_gift": "{user} envió {cant} {gift}",
-    "voice_chat": false,
+    "voice_chat": true,
     "voice_follow": false,
     "voice_gift": false,
     "filters_enabled": true,
@@ -15,18 +15,38 @@
             "duracion": "0"
         },
         {
+            "evento": "follow",
+            "filtro": "rebote",
+            "duracion": "6"
+        },
+        {
+            "evento": "Heart Me",
+            "filtro": "14_hold-up-tiktok",
+            "duracion": "5"
+        },
+        {
             "evento": "White Rose",
-            "filtro": "17_tmpdbnm_5a3",
+            "filtro": "13_fue-todo-en-la",
             "duracion": "5"
         },
         {
             "evento": "Rosa",
-            "filtro": "3_fahhhhhhhhhhhhhh",
+            "filtro": "15_social-credit-music",
             "duracion": "5"
         },
         {
-            "evento": "Heart Me",
-            "filtro": "0_anime-wow-sound-effect",
+            "evento": "Rose",
+            "filtro": "4_homero-gimiendo",
+            "duracion": "5"
+        },
+        {
+            "evento": "TikTok",
+            "filtro": "boom",
+            "duracion": "6"
+        },
+        {
+            "evento": "Finger Heart",
+            "filtro": "videoR",
             "duracion": "5"
         }
     ],

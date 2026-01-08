@@ -1,0 +1,6 @@
+__pycache__/
+venv/
+env/
+core/__pycache__/
+effect/__pycache__/
+core\profile\config.json

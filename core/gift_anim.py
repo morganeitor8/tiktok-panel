@@ -35,6 +35,16 @@ def descubrir_efectos():
                 if nombre not in efectos:  # Evitar colisiones
                     efectos[nombre] = "SONIDO_ESPECIFICO"
     
+        # 3. Videos específicos desde video/ 👈 NUEVO
+    carpeta_video = os.path.join(RAIZ, "video")
+    if os.path.exists(carpeta_video):
+        for archivo in os.listdir(carpeta_video):
+            if archivo.endswith('.mp4'):
+                partes = archivo.split('_', 1)
+                if partes and partes[0].isdigit():
+                    nombre = os.path.splitext(archivo)[0]  # sin .mp4
+                    efectos[nombre] = "VIDEO_ESPECIFICO"
+    
     return efectos
 
 # === MODO: listar efectos ===
@@ -65,6 +75,9 @@ def main():
             # Reproducir sonido específico
             from effect import effect_sonidoR
             resultado = effect_sonidoR.ejecutar_especifico(tipo, duracion_ms, volumen)
+        elif efectos[tipo] == "VIDEO_ESPECIFICO":  # 👈 NUEVO
+            from effect import effect_videoR
+            resultado = effect_videoR.ejecutar_especifico(tipo, duracion_ms, volumen)
         else:
             # Efecto normal
             resultado = efectos[tipo].ejecutar(duracion_ms, volumen)

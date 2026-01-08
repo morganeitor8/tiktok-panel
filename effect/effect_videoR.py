@@ -8,7 +8,7 @@ import time
 
 # === METADATOS ===
 NOMBRE = "videoR"
-VERSION = "1.3"
+VERSION = "1.4"
 
 # === FUNCIONES AUXILIARES ===
 COLOR_FONDO = "#FF00FF"
@@ -29,12 +29,13 @@ def crear_ventana_base():
     aplicar_estilo_fantasma(root)
     return root
 
-# === FUNCIÓN PRINCIPAL ===
-def ejecutar(duracion_ms=None, volumen=100):
+# === FUNCIÓN PARA REPRODUCIR VIDEO ESPECÍFICO ===
+def ejecutar_especifico(nombre_archivo, duracion_ms=None, volumen=100):
     """
-    Ejecuta un video aleatorio con audio.
+    Reproduce un archivo MP4 específico desde video/.
     
     Args:
+        nombre_archivo (str): Nombre del archivo sin extensión (ej. 'intro')
         duracion_ms (int, opcional): Duración en milisegundos.
             - Si es None o <= 0: reproduce hasta el final.
             - Si es > 0: corta tras ese tiempo (solo si el video dura más).
@@ -49,21 +50,10 @@ def ejecutar(duracion_ms=None, volumen=100):
     volumen = max(0, min(100, int(volumen) if volumen is not None else 100))
 
     ruta_videos = "video"
-    if not os.path.exists(ruta_videos):
-        return {"error": "Carpeta 'video/' no encontrada."}
-
-    archivos = []
-    for f in os.listdir(ruta_videos):
-        if f.endswith('.mp4'):
-            partes = f.split('_', 1)
-            if partes and partes[0].isdigit():
-                archivos.append(f)
-
-    if not archivos:
-        return {"error": "No hay videos en formato '{n}_nombre.mp4' en 'video/'."}
-
-    video = random.choice(archivos)
-    ruta_completa = os.path.abspath(os.path.join(ruta_videos, video))
+    ruta_completa = os.path.join(ruta_videos, f"{nombre_archivo}.mp4")
+    
+    if not os.path.exists(ruta_completa):
+        return {"error": f"Archivo '{nombre_archivo}.mp4' no encontrado en 'video/'."}
 
     root = crear_ventana_base()
     sw, sh = root.winfo_screenwidth(), root.winfo_screenheight()
@@ -78,7 +68,7 @@ def ejecutar(duracion_ms=None, volumen=100):
         player = instance.media_player_new()
         player.set_hwnd(root.winfo_id())
         
-        media = instance.media_new(ruta_completa)
+        media = instance.media_new(os.path.abspath(ruta_completa))
         player.set_media(media)
         player.audio_set_volume(volumen)
     except Exception as e:
@@ -86,7 +76,7 @@ def ejecutar(duracion_ms=None, volumen=100):
 
     duracion_usada = duracion_ms
     inicio_real = None
-    timer_activo = True  # Flag para evitar múltiples cierres
+    timer_activo = True
     
     def cerrar_ventana():
         nonlocal timer_activo
@@ -108,18 +98,15 @@ def ejecutar(duracion_ms=None, volumen=100):
             
         try:
             estado = player.get_state()
-            tiempo_actual = player.get_time()  # en ms
+            tiempo_actual = player.get_time()
             
-            # Registrar inicio real
             if inicio_real is None and tiempo_actual > 0:
                 inicio_real = time.time()
             
-            # Si el video terminó o hay error → cerrar inmediatamente
             if estado in (vlc.State.Ended, vlc.State.Error):
                 cerrar_ventana()
                 return
                 
-            # Si se definió duración y ya pasó → cerrar
             if duracion_usada is not None and duracion_usada > 0:
                 if inicio_real is not None:
                     tiempo_transcurrido = (time.time() - inicio_real) * 1000
@@ -127,18 +114,45 @@ def ejecutar(duracion_ms=None, volumen=100):
                         cerrar_ventana()
                         return
             
-            # Continuar verificando
             root.after(50, gestionar_reproduccion)
             
         except Exception:
             cerrar_ventana()
 
-    # Iniciar reproducción
     player.play()
     root.after(100, gestionar_reproduccion)
-
-    # Cierre manual
     root.protocol("WM_DELETE_WINDOW", cerrar_ventana)
     root.mainloop()
     
-    return {"mensaje": f"Efecto '{NOMBRE}' v{VERSION} ejecutado."}
+    return {"mensaje": f"Video '{nombre_archivo}' reproducido."}
+
+# === FUNCIÓN PRINCIPAL (ALEATORIA) ===
+def ejecutar(duracion_ms=None, volumen=100):
+    """
+    Ejecuta un video aleatorio con audio.
+    
+    Args:
+        duracion_ms (int, opcional): Duración en milisegundos.
+            - Si es None o <= 0: reproduce hasta el final.
+            - Si es > 0: corta tras ese tiempo (solo si el video dura más).
+        volumen (int, opcional): Volumen del audio (0-100). Por defecto: 100.
+    """
+    ruta_videos = "video"
+    if not os.path.exists(ruta_videos):
+        return {"error": "Carpeta 'video/' no encontrada."}
+
+    archivos = []
+    for f in os.listdir(ruta_videos):
+        if f.endswith('.mp4'):
+            partes = f.split('_', 1)
+            if partes and partes[0].isdigit():
+                archivos.append(f)
+
+    if not archivos:
+        return {"error": "No hay videos en formato '{n}_nombre.mp4' en 'video/'."}
+
+    video = random.choice(archivos)
+    nombre_sin_ext = os.path.splitext(video)[0]
+    
+    # Reutilizar la función específica
+    return ejecutar_especifico(nombre_sin_ext, duracion_ms, volumen)
