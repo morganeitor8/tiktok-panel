@@ -4,5 +4,4 @@ env/
 core/__pycache__/
 effect/__pycache__/
 core/profile/config.json
-core/profile/data.json
 log.txt
