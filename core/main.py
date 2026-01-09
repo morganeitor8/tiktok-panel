@@ -49,6 +49,7 @@ class MainPanel:
         self.queue = Queue()
         self.is_running = False
         self.config_file = "core/profile/config.json"
+        self.data_file = "core/data.json"  # 👈 NUEVO: archivo de datos globales
 
         # ---------------- CONFIG ----------------
         self.config_data = {
@@ -371,7 +372,7 @@ class MainPanel:
         if nombre_gift not in self.config_data["eventos"]:
             self.config_data["eventos"].append(nombre_gift)
             self.config_data["eventos"].sort()
-            self.guardar_configuracion_actual()
+            self.guardar_configuracion_actual()  # Esto ahora guarda en data.json
             print(f"🆕 Nuevo regalo registrado: {nombre_gift}")
 
     def deshabilitar_configuracion(self):
@@ -535,7 +536,9 @@ class MainPanel:
         ttk.Button(error_win, text="Aceptar", command=aceptar).pack(pady=10)
 
     def guardar_configuracion_actual(self):
-        self.config_data.update({
+        # Guardar configuración SIN eventos (van a data.json)
+        config_to_save = {k: v for k, v in self.config_data.items() if k != "eventos"}
+        config_to_save.update({
             "usuario_tiktok": self.ent_user.get(),
             "delay": self.delay_val.get(),
             "skip_delay_priority": self.skip_delay.get(),
@@ -546,7 +549,6 @@ class MainPanel:
             "voice_gift": self.voice_gift.get(),
             "filters_enabled": self.filters_enabled.get(),
             "filtros": self.exportar_filtros(),
-            "eventos": self.config_data["eventos"],
             "reconnect_interval": self.reconnect_interval.get(),
             "reconnect_attempts": self.reconnect_attempts.get(),
             "volume_tts": self.volume_tts_val.get(),
@@ -554,7 +556,9 @@ class MainPanel:
         })
         try:
             with open(self.config_file, "w", encoding="utf-8") as f:
-                json.dump(self.config_data, f, indent=4, ensure_ascii=False)
+                json.dump(config_to_save, f, indent=4, ensure_ascii=False)
+            # Guardar eventos por separado
+            self.save_persistent_data()
         except Exception as e:
             print("Error al guardar configuración:", e)
 
@@ -763,19 +767,82 @@ class MainPanel:
                 break
 
     def load_config(self):
+        # Crear directorios si no existen
+        os.makedirs("core/profile", exist_ok=True)
+        os.makedirs("core", exist_ok=True)
+        
+        # Cargar/guardar eventos en data.json
+        self.load_persistent_data()
+        
+        # Crear config.json si no existe
+        if not os.path.exists(self.config_file):
+            try:
+                with open(self.config_file, "w", encoding="utf-8") as f:
+                    # Configuración SIN eventos (ahora están en data.json)
+                    config_sin_eventos = {k: v for k, v in self.config_data.items() if k != "eventos"}
+                    json.dump(config_sin_eventos, f, indent=4, ensure_ascii=False)
+                print(f"✅ Archivo de configuración creado: {self.config_file}")
+            except Exception as e:
+                print(f"❌ Error al crear config.json: {e}")
+        
+        # Cargar configuración del perfil
         if os.path.exists(self.config_file):
-            with open(self.config_file, "r", encoding="utf-8") as f:
-                loaded = json.load(f)
-                # Mantener compatibilidad
-                self.config_data["volume_tts"] = loaded.get("volume_tts", 100)
-                self.config_data["volume_effects"] = loaded.get("volume_effects", 100)
-                # Actualizar el resto
-                for key in loaded:
-                    if key not in ["volume_tts", "volume_effects"]:
-                        self.config_data[key] = loaded[key]
+            try:
+                with open(self.config_file, "r", encoding="utf-8") as f:
+                    loaded = json.load(f)
+                    # Actualizar configuración (sin sobrescribir eventos)
+                    for key, value in loaded.items():
+                        if key != "eventos":  # Los eventos vienen de data.json
+                            self.config_data[key] = value
+            except Exception as e:
+                print(f"❌ Error al cargar config.json: {e}")
+
+    def load_persistent_data(self):
+        """Cargar eventos desde data.json (crearlo si no existe)."""
+        if not os.path.exists(self.data_file):
+            try:
+                # Datos por defecto para el repo
+                datos_por_defecto = {
+                    "eventos": [
+                        "2026", "Blue Heart", "Cake Slice", "Cap",
+                        "Capybara", "Doughnut", "Elephant trunk", "Finger Heart",
+                        "Flame Heart GDM", "GG", "Glow Stick", "Graduation Bouquet",
+                        "Hat and Mustache", "Heart", "Heart Me", "Heart Puff",
+                        "Hearts", "I'm Ready", "Ice Cream Cone", "Love you so much",
+                        "Maracas", "Popular Vote", "Rosa", "Rose",
+                        "Squirrel", "TGIF", "Team Cheers", "TikTok",
+                        "Wave Firework", "White Rose", "Woodland Wonder", "You're awesome"
+                    ]
+                }
+                with open(self.data_file, "w", encoding="utf-8") as f:
+                    json.dump(datos_por_defecto, f, indent=4, ensure_ascii=False)
+                print(f"✅ Archivo de datos creado: {self.data_file}")
+            except Exception as e:
+                print(f"❌ Error al crear data.json: {e}")
+                return
+        
+        # Cargar eventos existentes
+        try:
+            with open(self.data_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                self.config_data["eventos"] = data.get("eventos", ["Doughnut"])
+        except Exception as e:
+            print(f"❌ Error al cargar data.json: {e}")
+            self.config_data["eventos"] = ["Doughnut"]
+
+    def save_persistent_data(self):
+        """Guardar eventos en data.json."""
+        try:
+            data = {"eventos": self.config_data["eventos"]}
+            with open(self.data_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+        except Exception as e:
+            print(f"❌ Error al guardar data.json: {e}")
 
     def on_closing(self):
-        self.config_data.update({
+        # Guardar configuración SIN eventos
+        config_to_save = {k: v for k, v in self.config_data.items() if k != "eventos"}
+        config_to_save.update({
             "usuario_tiktok": self.ent_user.get(),
             "delay": self.delay_val.get(),
             "skip_delay_priority": self.skip_delay.get(),
@@ -786,16 +853,20 @@ class MainPanel:
             "voice_gift": self.voice_gift.get(),
             "filters_enabled": self.filters_enabled.get(),
             "filtros": self.exportar_filtros(),
-            "eventos": self.config_data["eventos"],
             "reconnect_interval": self.reconnect_interval.get(),
             "reconnect_attempts": self.reconnect_attempts.get(),
             "volume_tts": self.volume_tts_val.get(),
             "volume_effects": self.volume_effects_val.get()
         })
-        with open(self.config_file, "w", encoding="utf-8") as f:
-            json.dump(self.config_data, f, indent=4, ensure_ascii=False)
+        try:
+            with open(self.config_file, "w", encoding="utf-8") as f:
+                json.dump(config_to_save, f, indent=4, ensure_ascii=False)
+            # Guardar eventos por separado
+            self.save_persistent_data()
+        except Exception as e:
+            print("Error al guardar configuración:", e)
         self.root.destroy()
-        
+
 # ===== INICIALIZACIÓN SEGURA =====
 CROMA = 'white'
 if __name__ == "__main__":

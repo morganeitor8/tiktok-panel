@@ -1,6 +1,6 @@
 TikTok
 ├── venv/                   # entorno virtual
-├── cache                   # cache para carga rapida
+├── cache                   # cache para carga rapida (sin uso)
 │   └── .
 ├── core/
 │   ├── profile/
